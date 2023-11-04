@@ -11,15 +11,12 @@ from aiogram.types import Message
 
 from check_db import get_metrics
 
-# TOKEN = getenv("BOT_TOKEN")
-TOKEN = '6913487660:AAFhZf9PsCWN_vV4VLPOzlC0AqYw9fLNMJ4'
+TOKEN = getenv("BOT_TOKEN")
 
 dp = Dispatcher()
 
-# Словарь для хранения сообщений каждого пользователя
 user_messages = {}
 
-# Функция для отправки информации боту
 async def send_metrics_to_users(bot: Bot, user_id: int, metrics: str) -> None:
     if user_id in user_messages:
         message_id = user_messages[user_id]
@@ -28,11 +25,9 @@ async def send_metrics_to_users(bot: Bot, user_id: int, metrics: str) -> None:
         message = await bot.send_message(chat_id=user_id, text=metrics, parse_mode=ParseMode.HTML)
         user_messages[user_id] = message.message_id
 
-# Функция для удаления сообщения пользователя "get info"
 async def delete_user_message(bot: Bot, message: Message) -> None:
     await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
 
-# Функция для выполнения задачи каждые 15 секунд
 async def scheduled_get_info(bot: Bot, semaphore: asyncio.Event) -> None:
     while True:
         await semaphore.wait()
@@ -66,7 +61,6 @@ async def main() -> None:
     global semaphore
     semaphore = asyncio.Event()
     bot = Bot(TOKEN, parse_mode=ParseMode.HTML)
-    # Запуск задачи каждые 15 секунд
     asyncio.create_task(scheduled_get_info(bot, semaphore))
     await dp.start_polling(bot)
 
