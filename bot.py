@@ -11,8 +11,7 @@ from aiogram.utils.markdown import hbold
 
 from check_db import get_metrics
 
-# TOKEN = getenv("BOT_TOKEN")
-TOKEN = '6391602835:AAGCm1sqptuxQxNXL9BhrCUJSPDuw9qMBfc'
+TOKEN = getenv("BOT_TOKEN")
 
 dp = Dispatcher()
 
