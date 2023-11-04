@@ -1,4 +1,6 @@
 import psycopg2
+import asyncio
+import psutil
 
 def get_metrics():
     result_str = ''
@@ -8,7 +10,7 @@ def get_metrics():
             password="isvhX4#09",
             host="127.0.0.1",
             port="5432",
-            database="mydb"
+            database="q_data"
         )
         cursor = connection.cursor()
         
@@ -26,15 +28,21 @@ def get_metrics():
         lwlock_events = cursor.fetchone()
         result_str += f"Количество значений LWLock: {len(lwlock_events) if lwlock_events else 0}\n"
         # print(len(lwlock_events) if lwlock_events else 0)
-
-    except (Exception, psycopg2.Error) as error:
-        # print("Ошибка при подключении к базе данных PostgreSQL", error)
-        result_str += "Ошибка при подключении к базе данных PostgreSQL\n"
-    finally:
         if connection:
             cursor.close()
             connection.close()
-            # print("Соединение с базой данных закрыто")
+        disk_usage = psutil.disk_usage('/')
+        result_str += f"Свободное место на диске (в байтах): {disk_usage.free}\n"
+        cpu_percent = psutil.cpu_percent(interval=1)
+        result_str += f"Загруженность процессора (%): {cpu_percent}\n"
+        # print("Загруженность процессора (%):", cpu_percent)
+        # print("Свободное место на диске (в байтах):", disk_usage.free)
+
+    except Exception as e:
+        # print("Ошибка при подключении к базе данных PostgreSQL", error)
+        result_str = "Ошибка при подключении к базе данных PostgreSQL\n"
+        result_str += str(e)
+
     return result_str
 
 if __name__ == '__main__':
